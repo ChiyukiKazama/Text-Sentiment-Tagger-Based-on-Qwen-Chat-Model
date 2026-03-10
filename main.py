@@ -13,7 +13,7 @@ MODEL_PATH = ".\models\Qwen-7B-Chat-Int4\qwen\Qwen-7B-Chat-Int4"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 #print(torch.cuda.get_device_name(DEVICE))
 MAX_LENGTH = 512
-DATASET_SIZE = 10   #从原始数据集中随机抽取进行打标的条数
+DATASET_SIZE = 20   # 从原始数据集中随机抽取进行打标的条数
 
 # ====================== 2. 加载GPTQ量化的Qwen模型  ======================
 def load_model():
@@ -90,7 +90,7 @@ def load_dataset(dataset_size, csv_path="./dataset/ChnSentiCorp.csv"):
         return []
 
 # ====================== 4. 情感打标核心函数  ======================
-def get_sentiment_tag(text, tokenizer, model):
+def get_tag(text, tokenizer, model):
     """
     调用GPTQ量化模型生成中文评论的情感标签
     """
@@ -113,7 +113,7 @@ def get_sentiment_tag(text, tokenizer, model):
         outputs = model.generate(
             **inputs,
             max_new_tokens=4,
-            do_sample=False,  #GreedySearch
+            do_sample=False,  # GreedySearch
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
             repetition_penalty=1.1,
@@ -128,7 +128,6 @@ def get_sentiment_tag(text, tokenizer, model):
         tag = "未知"
 
     return tag
-
 
 # ====================== 5. 主函数  ======================
 if __name__ == "__main__":
@@ -148,21 +147,21 @@ if __name__ == "__main__":
     start_time = time.time()
     total_tags = 0
 
-    # 创建一个列表来存储所有结果
-    output_data = []
     # 创建一个列表来存储原始评论
     input_data = []
+    # 创建一个列表来存储所有结果
+    output_data = []
 
     for i, text in enumerate(texts):
-        label = get_sentiment_tag(text, tokenizer, model)
+        tag = get_tag(text, tokenizer, model)
 
         print(
-            f"[{i + 1:3d}/{len(texts):3d}] 标签: {label:2s} | 文本: {text[:]}...")
+            f"[{i + 1:3d}/{len(texts):3d}] 标签: {tag:2s} | 文本: {text[:]}...")
 
         total_tags += 1
 
         # 将每一条预测结果和原文本添加到一个列表中
-        output_data.append({'Sentiment': label, 'Comment': text})
+        output_data.append({'Sentiment': tag, 'Comment': text})
         # 将原始评论添加到另一个列表中
         input_data.append({'Comment': text})
 
@@ -175,21 +174,18 @@ if __name__ == "__main__":
     print(f"总耗时: {elapsed_time:.2f} 秒")
     print(f"平均速度: {total_tags / elapsed_time:.2f} 条/秒" if elapsed_time > 0 else "平均速度: N/A")
 
-    # 创建结果保存目录
-    input_dir = "./example/input"
-    output_dir = "./example/output"
-
+    time_suffix = str(time.time())[-6:]    # 输入输出csv文件名使用生成时间作为后缀
     # 将原始评论保存到CSV文件
     if input_data:
         input_df = pd.DataFrame(input_data)
-        input_filename = f"input_{int(time.time())[-6:]}.csv"
+        input_filename = f"input_{time_suffix}.csv"
         input_df.to_csv(f'./example/input/{input_filename}', index=False, encoding='utf-8')
         print(f"\n打标结果输出已保存至: ./example/input/{input_filename}")
 
     # 将打标结果保存到带标签的CSV文件
     if output_data:
         output_df = pd.DataFrame(output_data)
-        output_filename = f"output_{int(time.time())[-6:]}.csv"
+        output_filename = f"output_{time_suffix}.csv"
         output_df.to_csv(f'./example/output/{output_filename}', index=False, encoding='utf-8')
         print(f"打标结果输出已保存至: ./example/output/{output_filename}")
 

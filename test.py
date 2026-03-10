@@ -13,7 +13,7 @@ MODEL_PATH = ".\models\Qwen-7B-Chat-Int4\qwen\Qwen-7B-Chat-Int4"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(torch.cuda.get_device_name(DEVICE))
 MAX_LENGTH = 512
-DATASET_SIZE = 100   #从原始数据集中随机抽取进行打标的条数
+DATASET_SIZE = 1000   #从原始数据集中随机抽取进行打标的条数
 
 # ====================== 2. 加载GPTQ量化的Qwen模型  ======================
 def load_model():
