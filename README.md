@@ -18,19 +18,34 @@
 
 ## 项目结构
 
-\```TextSentimentTagger/
-├── main.py
-├── download_model.py
-├── README.md
-├── design_document.md
-├── requirements.txt
-├── models/
-│ └── Qwen-7B-Chat-Int4/
-├── datasets/
-│ └── ChnSentiCorp.csv
-└── example/
-├── input/
-└── output/\``
++ TextSentimentTagger/
+
+  + main.py
+
+  + download_model
+
+  + README.md
+
+  + document.md
+
+  + requirements.txt
+
+  + model/
+
+    + (Qwen-7B-Chat-Int4/)
+
+  + dataset/
+
+    + ChnSentiCorp.csv
+
+  + example/
+
+    + input/
+    + output/
+
+    
+
+
 
 ## 设计与思考
 
